@@ -174,7 +174,6 @@ BOOL CMediaPlayerDlg::OnInitDialog()
 		LR_DEFAULTCOLOR
 	);
 	btn_Load.SetIcon(hIcn);
-
 	
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -412,7 +411,7 @@ void CMediaPlayerDlg::LoadFile(CString filepath)
 	SetTimer(1, 1000, NULL);
 
 	int total = MCIWndGetLength(m_Player);
-	total = total / 980;
+	total = total / 1000;
 	int minutes = total / 60;
 	int seconds = total % 60;
 

@@ -54,6 +54,7 @@
     <None Include="res\MediaPlayer.rc2">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="res\eq.avi" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\MediaPlayer.ico">

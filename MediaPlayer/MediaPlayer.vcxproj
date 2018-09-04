@@ -207,6 +207,7 @@
     <ResourceCompile Include="MediaPlayer.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\eq.avi" />
     <None Include="res\MediaPlayer.rc2" />
   </ItemGroup>
   <ItemGroup>
