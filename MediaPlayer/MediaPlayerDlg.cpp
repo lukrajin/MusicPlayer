@@ -282,6 +282,7 @@ void CMediaPlayerDlg::OnBnClickedLoad()
 	if (dlgFile.DoModal() == IDOK)
 	{
 		CString file = dlgFile.GetPathName();
+		loadMode = ADD;
 		LoadFile(file);
 
 		
@@ -331,8 +332,19 @@ void CMediaPlayerDlg::OnTimer(UINT_PTR nIDEvent)
 		filenameLabel.SetWindowTextW(caption);
 	}
 	UpdateData(FALSE);
-	if (time_Slider.GetPos() == time_Slider.GetRangeMax())
-		OnBnClickedStop();
+	if (time_Slider.GetPos() == time_Slider.GetRangeMax()) {
+		int currentTrack = playlistCtrl.FindString(-1, filename);
+		if (currentTrack + 1 >= playlistCtrl.GetCount())
+			OnBnClickedStop();
+		else {
+			CString next;
+			playlistCtrl.SetCurSel(currentTrack + 1);
+			playlistCtrl.GetText(currentTrack + 1,next );
+			LoadFile(playlist.at(next));
+			caption.Format(_T("Playing: %s"), filename);
+			filenameLabel.SetWindowTextW(caption);
+		}
+	}
 	CDialogEx::OnTimer(nIDEvent);
 }
 
@@ -355,12 +367,11 @@ void CMediaPlayerDlg::OnDropFiles(HDROP hDropInfo)
 		// Get path and name of the file 
 		DragQueryFile(hDropInfo, i, sFile.GetBuffer(nBuffer + 1), nBuffer + 1);
 		sFile.ReleaseBuffer();
-
+		loadMode = ADD;
 		LoadFile(sFile);
 
 	}
-
-
+	
 	CDialogEx::OnDropFiles(hDropInfo);
 }
 
@@ -371,6 +382,24 @@ void CMediaPlayerDlg::LoadFile(CString filepath)
 		playlist[filename] = filepath;
 		playlistCtrl.AddString(filename);
 	}
+	
+	if (loadMode == ADD ) {
+		if (state == UNLOADED) {
+			playlistCtrl.SetCurSel(0);
+			CString first;
+			playlistCtrl.GetText(0, first);
+			filename = first;
+			filepath = playlist.at(first);
+		}
+		else {
+			CString current;
+			playlistCtrl.GetText(0, current);
+			filename = current;
+			return;
+		}
+		
+	}
+	
 	caption.Format(_T("Playing: %s"), filename);
 	filenameLabel.SetWindowTextW(caption);
 	MCIWndClose(m_Player);
@@ -427,6 +456,7 @@ void CMediaPlayerDlg::OnLbnDblclkList1()
 	int index;
 	index = playlistCtrl.GetCurSel();
 	playlistCtrl.GetText(index, selectedFileName);
+	loadMode = CHANGE;
 	LoadFile(playlist.at(selectedFileName));
 	caption.Format(_T("Playing: %s"), filename);
 	filenameLabel.SetWindowTextW(caption);

@@ -10,6 +10,8 @@
 #define PAUSED 1
 #define STOPPED 2
 #define UNLOADED 3
+#define ADD 4
+#define CHANGE 5
 
 // CMediaPlayerDlg dialog
 class CMediaPlayerDlg : public CDialogEx
@@ -69,5 +71,6 @@ public:
 	CString filename;
 	CString caption;
 	CString dots;
+	int loadMode;
 	afx_msg void OnLbnDblclkList1();
 };
