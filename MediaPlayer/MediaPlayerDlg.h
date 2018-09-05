@@ -87,4 +87,5 @@ public:
 	afx_msg void OnBnClickedBwdbutton();
 	afx_msg void OnBnClickedRecbutton();
 	long recLenght;
+	CStatic audioImage;
 };

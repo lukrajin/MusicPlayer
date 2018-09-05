@@ -212,6 +212,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\bitmap1.bmp" />
+    <Image Include="res\bitmap2.bmp" />
     <Image Include="res\default-cover-art.bmp" />
     <Image Include="res\defaultart.bmp" />
     <Image Include="res\Forward.ico" />
@@ -222,6 +223,7 @@
     <Image Include="res\Play.ico" />
     <Image Include="res\Reapeat.ico" />
     <Image Include="res\Rec.ico" />
+    <Image Include="res\recording.bmp" />
     <Image Include="res\Rewind.ico" />
     <Image Include="res\Stop.ico" />
     <Image Include="res\track.gif" />

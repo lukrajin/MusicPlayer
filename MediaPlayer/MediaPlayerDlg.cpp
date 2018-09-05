@@ -81,6 +81,7 @@ void CMediaPlayerDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, RECBUTTON, rec_Btn);
 	DDX_Control(pDX, BWDBUTTON, bwd_Btn);
 	DDX_Control(pDX, FWDBUTTON, fws_Btn);
+	DDX_Control(pDX, AUDIOIMAGE, audioImage);
 }
 
 BEGIN_MESSAGE_MAP(CMediaPlayerDlg, CDialogEx)
@@ -223,6 +224,10 @@ BOOL CMediaPlayerDlg::OnInitDialog()
 		LR_DEFAULTCOLOR
 	);
 	bwd_Btn.SetIcon(hIcn);
+
+	audioImage.ModifyStyle(0, SS_BITMAP);
+	audioImage.SetBitmap(::LoadBitmap(
+		_AtlBaseModule.GetResourceInstance(), MAKEINTRESOURCE(IDB_BITMAP1)));
 	
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -315,11 +320,15 @@ void CMediaPlayerDlg::OnBnClickedStop()
 	if (state == RECORDING) {
 		if (MCIWndCanSave(m_Player)) {
 			
+			audioImage.SetBitmap(::LoadBitmap(
+				_AtlBaseModule.GetResourceInstance(), MAKEINTRESOURCE(IDB_BITMAP1)));
 			state = UNLOADED;
 			btn_Play.EnableWindow(true);
 			btn_Stop.EnableWindow(false);
 			btn_Load.EnableWindow(true);
 			rec_Btn.EnableWindow(true);
+			vol_Btn.EnableWindow(true);
+			volume_slider.EnableWindow(true);
 			KillTimer(1);
 			time_Label.SetWindowTextW(_T("00:00/00:00"));
 			caption.Format(_T("File is not loaded"));
@@ -327,6 +336,7 @@ void CMediaPlayerDlg::OnBnClickedStop()
 			MCIWndStop(m_Player);
 			MCIWndSaveDialog(m_Player);
 			MCIWndDestroy(m_Player);
+			recLenght = 0;
 			return;
 		}
 
@@ -652,7 +662,8 @@ void CMediaPlayerDlg::OnBnClickedRecbutton()
 		
 		MCIWndHome(m_Player);
 		MCIWndRecord(m_Player);
-
+		audioImage.SetBitmap(::LoadBitmap(
+			_AtlBaseModule.GetResourceInstance(), MAKEINTRESOURCE(IDB_BITMAP2)));
 		btn_Play.EnableWindow(false);
 		btn_Stop.EnableWindow(true);
 		btn_Load.EnableWindow(false);
@@ -660,6 +671,8 @@ void CMediaPlayerDlg::OnBnClickedRecbutton()
 		fws_Btn.EnableWindow(false);
 		bwd_Btn.EnableWindow(false);
 		rec_Btn.EnableWindow(false);
+		vol_Btn.EnableWindow(false);
+		volume_slider.EnableWindow(false);
 
 		state = RECORDING;
 		time_Slider.SetPos(0);
