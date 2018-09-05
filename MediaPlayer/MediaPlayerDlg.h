@@ -86,4 +86,5 @@ public:
 	void NextTrack();
 	afx_msg void OnBnClickedBwdbutton();
 	afx_msg void OnBnClickedRecbutton();
+	long recLenght;
 };

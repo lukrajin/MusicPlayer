@@ -314,14 +314,20 @@ void CMediaPlayerDlg::OnBnClickedStop()
 	// TODO: Add your control notification handler code here
 	if (state == RECORDING) {
 		if (MCIWndCanSave(m_Player)) {
-			MCIWndSaveDialog(m_Player);
-			MCIWndDestroy(m_Player);
+			
+			state = UNLOADED;
+			btn_Play.EnableWindow(true);
+			btn_Stop.EnableWindow(false);
 			btn_Load.EnableWindow(true);
 			rec_Btn.EnableWindow(true);
-			state = UNLOADED;
-			btn_Stop.EnableWindow(false);
+			KillTimer(1);
 			time_Label.SetWindowTextW(_T("00:00/00:00"));
 			caption.Format(_T("File is not loaded"));
+			filenameLabel.SetWindowTextW(caption);
+			MCIWndStop(m_Player);
+			MCIWndSaveDialog(m_Player);
+			MCIWndDestroy(m_Player);
+			return;
 		}
 
 	}
@@ -383,9 +389,22 @@ void CMediaPlayerDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 void CMediaPlayerDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	
-	if (state == RECORDING)
-		/*TODO*/
+	if (state == RECORDING) {
+		++recLenght;
+		int minutes = recLenght / 60;
+		int seconds = recLenght % 60;
+		CString a;
+		if (seconds < 10 && minutes < 10)
+			a.Format(_T("0%d:0%d"), minutes, seconds);
+		else if (seconds < 10)
+			a.Format(_T("%d:0%d"), minutes, seconds);
+		else if (minutes < 10)
+			a.Format(_T("0%d:%d"), minutes, seconds);
+		
+		time_Label.SetWindowTextW(a);
 		return;
+	}	
+
 	UpdateTimeCaption();
 	if (state == PLAYING) {
 		if (dots == "")
@@ -621,25 +640,32 @@ void CMediaPlayerDlg::OnBnClickedRecbutton()
 	MCIWndClose(m_Player);
 	MCIWndDestroy(m_Player);
 	KillTimer(1);
-	
+
 	m_Player = MCIWndCreate(GetSafeHwnd(), AfxGetInstanceHandle(),
 		WS_CHILD | MCIWNDF_RECORD, NULL);
-	MCIWndNew(m_Player, "recording"); //Error
+
+	MCIWndNew(m_Player,_T("waveaudio"));
 	
-	if (MCIWndCanRecord(m_Player))//Error
+	if (MCIWndCanRecord(m_Player))
 	{
 		
 		MCIWndHome(m_Player);
 		MCIWndRecord(m_Player);
+
 		btn_Play.EnableWindow(false);
 		btn_Stop.EnableWindow(true);
 		btn_Load.EnableWindow(false);
+		btn_Pause.EnableWindow(false);
+		fws_Btn.EnableWindow(false);
+		bwd_Btn.EnableWindow(false);
 		rec_Btn.EnableWindow(false);
-		SetTimer(1, 1000, NULL);
+
 		state = RECORDING;
 		time_Slider.SetPos(0);
 		time_Slider.EnableWindow(false);
-		caption.Format(_T("Recording"));
+		caption.Format(_T("Recording..."));
+		filenameLabel.SetWindowTextW(caption);
+		SetTimer(1, 1000, NULL);
 	}
 	else
 	{
@@ -655,6 +681,7 @@ void CMediaPlayerDlg::OnBnClickedRecbutton()
 		state = UNLOADED;
 		time_Label.SetWindowTextW(_T("00:00/00:00"));
 		caption.Format(_T("File is not loaded"));
+		filenameLabel.SetWindowTextW(caption);
 		time_Slider.SetPos(0);
 		
 
