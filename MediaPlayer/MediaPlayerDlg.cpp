@@ -645,6 +645,7 @@ void CMediaPlayerDlg::OnBnClickedRecbutton()
 		WS_CHILD | MCIWNDF_RECORD, NULL);
 
 	MCIWndNew(m_Player,_T("waveaudio"));
+	playlistCtrl.SetCurSel(-1);
 	
 	if (MCIWndCanRecord(m_Player))
 	{
