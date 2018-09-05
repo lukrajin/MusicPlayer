@@ -12,6 +12,9 @@
 #define UNLOADED 3
 #define ADD 4
 #define CHANGE 5
+#define MUTED 6
+#define RECORDING 7
+
 
 // CMediaPlayerDlg dialog
 class CMediaPlayerDlg : public CDialogEx
@@ -73,4 +76,14 @@ public:
 	CString dots;
 	int loadMode;
 	afx_msg void OnLbnDblclkList1();
+	CButton vol_Btn;
+	CButton rec_Btn;
+	CButton bwd_Btn;
+	CButton fws_Btn;
+	afx_msg void OnBnClickedVolumebutton();
+	long oldVolume;
+	afx_msg void OnBnClickedFwdbutton();
+	void NextTrack();
+	afx_msg void OnBnClickedBwdbutton();
+	afx_msg void OnBnClickedRecbutton();
 };

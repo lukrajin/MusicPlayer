@@ -93,5 +93,14 @@
     <Image Include="res\track.gif">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="res\Mute.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Rec.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Rewind.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

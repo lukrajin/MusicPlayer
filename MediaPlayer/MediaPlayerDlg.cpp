@@ -77,6 +77,10 @@ void CMediaPlayerDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, LOAD, btn_Load);
 	DDX_Control(pDX, VOLUMECAPTION, volumeCaption);
 	DDX_Control(pDX, IDC_LIST1, playlistCtrl);
+	DDX_Control(pDX, VOLUMEBUTTON, vol_Btn);
+	DDX_Control(pDX, RECBUTTON, rec_Btn);
+	DDX_Control(pDX, BWDBUTTON, bwd_Btn);
+	DDX_Control(pDX, FWDBUTTON, fws_Btn);
 }
 
 BEGIN_MESSAGE_MAP(CMediaPlayerDlg, CDialogEx)
@@ -91,6 +95,10 @@ BEGIN_MESSAGE_MAP(CMediaPlayerDlg, CDialogEx)
 	ON_WM_TIMER()
 	ON_WM_DROPFILES()
 	ON_LBN_DBLCLK(IDC_LIST1, &CMediaPlayerDlg::OnLbnDblclkList1)
+	ON_BN_CLICKED(VOLUMEBUTTON, &CMediaPlayerDlg::OnBnClickedVolumebutton)
+	ON_BN_CLICKED(FWDBUTTON, &CMediaPlayerDlg::OnBnClickedFwdbutton)
+	ON_BN_CLICKED(BWDBUTTON, &CMediaPlayerDlg::OnBnClickedBwdbutton)
+	ON_BN_CLICKED(RECBUTTON, &CMediaPlayerDlg::OnBnClickedRecbutton)
 END_MESSAGE_MAP()
 
 
@@ -150,7 +158,7 @@ BOOL CMediaPlayerDlg::OnInitDialog()
 		AfxGetApp()->m_hInstance,
 		MAKEINTRESOURCE(IDI_ICON6),
 		IMAGE_ICON,
-		45, 45, 
+		35, 35, 
 		LR_DEFAULTCOLOR
 	);
 	btn_Stop.SetIcon(hIcn);
@@ -160,7 +168,7 @@ BOOL CMediaPlayerDlg::OnInitDialog()
 		AfxGetApp()->m_hInstance,
 		MAKEINTRESOURCE(IDI_ICON3),
 		IMAGE_ICON,
-		45, 45, 
+		35, 35, 
 		LR_DEFAULTCOLOR
 	);
 	btn_Pause.SetIcon(hIcn);
@@ -174,6 +182,47 @@ BOOL CMediaPlayerDlg::OnInitDialog()
 		LR_DEFAULTCOLOR
 	);
 	btn_Load.SetIcon(hIcn);
+
+	rec_Btn.ModifyStyle(0, BS_ICON);
+	hIcn = (HICON)LoadImage(
+		AfxGetApp()->m_hInstance,
+		MAKEINTRESOURCE(IDI_ICON9),
+		IMAGE_ICON,
+		40, 40,
+		LR_DEFAULTCOLOR
+	);
+	rec_Btn.SetIcon(hIcn);
+
+	vol_Btn.ModifyStyle(0, BS_ICON);
+	hIcn = (HICON)LoadImage(
+		AfxGetApp()->m_hInstance,
+		MAKEINTRESOURCE(IDI_ICON7),
+		IMAGE_ICON,
+		32, 32,
+		LR_DEFAULTCOLOR
+	);
+	vol_Btn.SetIcon(hIcn);
+
+	fws_Btn.ModifyStyle(0, BS_ICON);
+	hIcn = (HICON)LoadImage(
+		AfxGetApp()->m_hInstance,
+		MAKEINTRESOURCE(IDI_ICON1),
+		IMAGE_ICON,
+		35, 35,
+		LR_DEFAULTCOLOR
+	);
+
+	fws_Btn.SetIcon(hIcn);
+
+	bwd_Btn.ModifyStyle(0, BS_ICON);
+	hIcn = (HICON)LoadImage(
+		AfxGetApp()->m_hInstance,
+		MAKEINTRESOURCE(IDI_ICON10),
+		IMAGE_ICON,
+		35, 35,
+		LR_DEFAULTCOLOR
+	);
+	bwd_Btn.SetIcon(hIcn);
 	
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -232,11 +281,15 @@ HCURSOR CMediaPlayerDlg::OnQueryDragIcon()
 void CMediaPlayerDlg::OnBnClickedPlay()
 {
 	// TODO: Add your control notification handler code here
-
+	if (state == UNLOADED) {
+		OnBnClickedLoad();
+		return;
+	}
 	MCIWndPlay(m_Player);
 	btn_Pause.EnableWindow(true);
 	btn_Play.EnableWindow(false);
 	btn_Stop.EnableWindow(true);
+	
 	caption.Format(_T("Playing: %s"), filename);
 	filenameLabel.SetWindowTextW(caption);
 	state = PLAYING;
@@ -259,6 +312,19 @@ void CMediaPlayerDlg::OnBnClickedPause()
 void CMediaPlayerDlg::OnBnClickedStop()
 {
 	// TODO: Add your control notification handler code here
+	if (state == RECORDING) {
+		if (MCIWndCanSave(m_Player)) {
+			MCIWndSaveDialog(m_Player);
+			MCIWndDestroy(m_Player);
+			btn_Load.EnableWindow(true);
+			rec_Btn.EnableWindow(true);
+			state = UNLOADED;
+			btn_Stop.EnableWindow(false);
+			time_Label.SetWindowTextW(_T("00:00/00:00"));
+			caption.Format(_T("File is not loaded"));
+		}
+
+	}
 	MCIWndStop(m_Player);
 	MCIWndSeek(m_Player, 0);
 	btn_Play.EnableWindow(true);
@@ -316,6 +382,10 @@ void CMediaPlayerDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 }
 void CMediaPlayerDlg::OnTimer(UINT_PTR nIDEvent)
 {
+	
+	if (state == RECORDING)
+		/*TODO*/
+		return;
 	UpdateTimeCaption();
 	if (state == PLAYING) {
 		if (dots == "")
@@ -332,17 +402,7 @@ void CMediaPlayerDlg::OnTimer(UINT_PTR nIDEvent)
 	}
 	UpdateData(FALSE);
 	if (time_Slider.GetPos() == time_Slider.GetRangeMax()) {
-		int currentTrack = playlistCtrl.FindString(-1, filename);
-		if (currentTrack + 1 >= playlistCtrl.GetCount())
-			OnBnClickedStop();
-		else {
-			CString next;
-			playlistCtrl.SetCurSel(currentTrack + 1);
-			playlistCtrl.GetText(currentTrack + 1,next );
-			LoadFile(playlist.at(next));
-			caption.Format(_T("Playing: %s"), filename);
-			filenameLabel.SetWindowTextW(caption);
-		}
+		NextTrack();
 	}
 	CDialogEx::OnTimer(nIDEvent);
 }
@@ -380,6 +440,7 @@ void CMediaPlayerDlg::LoadFile(CString filepath)
 	if (playlist.find(filename) == playlist.end()) {
 		playlist[filename] = filepath;
 		playlistCtrl.AddString(filename);
+		UpdateData(false);
 	}
 	
 	if (loadMode == ADD ) {
@@ -403,6 +464,7 @@ void CMediaPlayerDlg::LoadFile(CString filepath)
 	filenameLabel.SetWindowTextW(caption);
 	MCIWndClose(m_Player);
 	MCIWndDestroy(m_Player);
+	KillTimer(1);
 	m_Player = MCIWndCreate(GetSafeHwnd(), AfxGetInstanceHandle(),
 		WS_CHILD, filepath);
 	MCIWndSetVolume(m_Player, volume_slider.GetPos());
@@ -426,6 +488,8 @@ void CMediaPlayerDlg::LoadFile(CString filepath)
 	btn_Pause.EnableWindow(true);
 	btn_Play.EnableWindow(false);
 	btn_Stop.EnableWindow(true);
+	fws_Btn.EnableWindow(true);
+	bwd_Btn.EnableWindow(true);
 	time_Slider.EnableWindow(true);
 	state = PLAYING;
 	
@@ -433,8 +497,10 @@ void CMediaPlayerDlg::LoadFile(CString filepath)
 }
 
 void CMediaPlayerDlg::UpdateTimeCaption() {
+
 	long position = MCIWndGetPosition(m_Player);
-	time_Slider.SetPos(position);
+	if(state!=RECORDING)
+		time_Slider.SetPos(position);
 	position = position / 980;
 	int minutes = position / 60;
 	int seconds = position % 60;
@@ -460,4 +526,137 @@ void CMediaPlayerDlg::OnLbnDblclkList1()
 	caption.Format(_T("Playing: %s"), filename);
 	filenameLabel.SetWindowTextW(caption);
 	
+}
+
+
+void CMediaPlayerDlg::OnBnClickedVolumebutton()
+{
+	HICON hIcn;
+	if (state == MUTED) {
+		CString s;
+		s.Format(_T("%d%s"), oldVolume / 10, "%");
+		volumeCaption.SetWindowTextW(s);
+		volume_slider.EnableWindow(true);
+		MCIWndSetVolume(m_Player, oldVolume);
+		volume_slider.SetPos(oldVolume);
+		vol_Btn.ModifyStyle(0, BS_ICON);
+		hIcn = (HICON)LoadImage(
+			AfxGetApp()->m_hInstance,
+			MAKEINTRESOURCE(IDI_ICON7),
+			IMAGE_ICON,
+			32, 32,
+			LR_DEFAULTCOLOR
+		);
+		vol_Btn.SetIcon(hIcn);
+		state = PLAYING;
+	}
+	else
+	{
+		CString s;
+		s.Format(_T("%d%s"), 0, "%");
+		volumeCaption.SetWindowTextW(s);
+		volume_slider.EnableWindow(false);
+		state = MUTED;
+		oldVolume = volume_slider.GetPos();
+		MCIWndSetVolume(m_Player, 0);
+		vol_Btn.ModifyStyle(0, BS_ICON);
+		hIcn = (HICON)LoadImage(
+			AfxGetApp()->m_hInstance,
+			MAKEINTRESOURCE(IDI_ICON8),
+			IMAGE_ICON,
+			32, 32,
+			LR_DEFAULTCOLOR
+		);
+		vol_Btn.SetIcon(hIcn);
+		volume_slider.SetPos(0);
+	}
+
+}
+
+
+void CMediaPlayerDlg::OnBnClickedFwdbutton()
+{
+	NextTrack();
+}
+void CMediaPlayerDlg::NextTrack()
+{
+	loadMode = CHANGE;
+	int currentTrack = playlistCtrl.FindString(-1, filename);
+	if (currentTrack + 1 >= playlistCtrl.GetCount())
+		OnBnClickedStop();
+	else {
+		CString next;
+		playlistCtrl.SetCurSel(currentTrack + 1);
+		playlistCtrl.GetText(currentTrack + 1, next);
+		LoadFile(playlist.at(next));
+		caption.Format(_T("Playing: %s"), filename);
+		filenameLabel.SetWindowTextW(caption);
+	}
+	
+}
+
+void CMediaPlayerDlg::OnBnClickedBwdbutton()
+{
+	loadMode = CHANGE;
+	int currentTrack = playlistCtrl.FindString(-1, filename);
+	if (currentTrack - 1 < 0) {
+
+		MCIWndSeek(m_Player, 0);
+		OnBnClickedPlay();
+	}
+	else {
+		CString prev;
+		playlistCtrl.SetCurSel(currentTrack -1);
+		playlistCtrl.GetText(currentTrack - 1, prev);
+		LoadFile(playlist.at(prev));
+		caption.Format(_T("Playing: %s"), filename);
+		filenameLabel.SetWindowTextW(caption);
+	}
+	
+}
+
+
+void CMediaPlayerDlg::OnBnClickedRecbutton()
+{
+	MCIWndClose(m_Player);
+	MCIWndDestroy(m_Player);
+	KillTimer(1);
+	
+	m_Player = MCIWndCreate(GetSafeHwnd(), AfxGetInstanceHandle(),
+		WS_CHILD | MCIWNDF_RECORD, NULL);
+	MCIWndNew(m_Player, "recording"); //Error
+	
+	if (MCIWndCanRecord(m_Player))//Error
+	{
+		
+		MCIWndHome(m_Player);
+		MCIWndRecord(m_Player);
+		btn_Play.EnableWindow(false);
+		btn_Stop.EnableWindow(true);
+		btn_Load.EnableWindow(false);
+		rec_Btn.EnableWindow(false);
+		SetTimer(1, 1000, NULL);
+		state = RECORDING;
+		time_Slider.SetPos(0);
+		time_Slider.EnableWindow(false);
+		caption.Format(_T("Recording"));
+	}
+	else
+	{
+		MessageBoxA(GetSafeHwnd(),
+			"This device doesn't record.",
+			"Error",
+			MB_OK);
+		btn_Play.EnableWindow(true);
+		btn_Stop.EnableWindow(false);
+		btn_Pause.EnableWindow(false);
+		fws_Btn.EnableWindow(false);
+		bwd_Btn.EnableWindow(false);
+		state = UNLOADED;
+		time_Label.SetWindowTextW(_T("00:00/00:00"));
+		caption.Format(_T("File is not loaded"));
+		time_Slider.SetPos(0);
+		
+
+	}
 }

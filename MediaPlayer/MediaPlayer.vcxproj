@@ -217,9 +217,12 @@
     <Image Include="res\Forward.ico" />
     <Image Include="res\Load.ico" />
     <Image Include="res\MediaPlayer.ico" />
+    <Image Include="res\Mute.ico" />
     <Image Include="res\Pause.ico" />
     <Image Include="res\Play.ico" />
     <Image Include="res\Reapeat.ico" />
+    <Image Include="res\Rec.ico" />
+    <Image Include="res\Rewind.ico" />
     <Image Include="res\Stop.ico" />
     <Image Include="res\track.gif" />
     <Image Include="res\Volume.ico" />
