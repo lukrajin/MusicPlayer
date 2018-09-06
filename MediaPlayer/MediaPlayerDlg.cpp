@@ -247,6 +247,13 @@ BOOL CMediaPlayerDlg::OnInitDialog()
 	m_FontVol->CreatePointFont(70, _T("Bahnschrift"));
 	GetDlgItem(VOLUMECAPTION)->SetFont(m_FontVol, TRUE);
 	
+	/*
+	CString filepath = GetCommandLine();
+	filepath.Delete(filepath.GetLength() - 1);
+	CString name = filepath.Mid(filepath.ReverseFind('\\') + 1);
+	if(name!="MediaPlayer.exe")
+		LoadFile(filepath);
+	*/
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
