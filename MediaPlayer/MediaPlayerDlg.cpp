@@ -246,6 +246,7 @@ BOOL CMediaPlayerDlg::OnInitDialog()
 	CFont *m_FontVol = new CFont();
 	m_FontVol->CreatePointFont(70, _T("Bahnschrift"));
 	GetDlgItem(VOLUMECAPTION)->SetFont(m_FontVol, TRUE);
+		
 	
 	/*
 	CString filepath = GetCommandLine();
@@ -504,6 +505,9 @@ void CMediaPlayerDlg::OnDropFiles(HDROP hDropInfo)
 void CMediaPlayerDlg::LoadFile(CString filepath) 
 {
 	filename = filepath.Mid(filepath.ReverseFind('\\') + 1);
+	CString filex = filename.Mid(filename.ReverseFind('.') + 1);
+	
+
 	if (playlist.find(filename) == playlist.end()) {
 		playlist[filename] = filepath;
 		playlistCtrl.AddString(filename);
@@ -534,8 +538,13 @@ void CMediaPlayerDlg::LoadFile(CString filepath)
 	KillTimer(1);
 	m_Player = MCIWndCreate(GetSafeHwnd(), AfxGetInstanceHandle(),
 		WS_CHILD,filepath);
-
-	MCIWndSetVolume(m_Player, volume_slider.GetPos());
+	if (filex != "wav") {
+		volume_slider.EnableWindow(true);
+		MCIWndSetVolume(m_Player, volume_slider.GetPos());
+	}
+	else
+		volume_slider.EnableWindow(false);
+	
 	MCIWndPlay(m_Player);
 	time_Slider.SetRangeMax(MCIWndGetLength(m_Player));
 	SetTimer(1, 1000, NULL);
