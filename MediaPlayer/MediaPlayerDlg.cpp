@@ -322,7 +322,7 @@ void CMediaPlayerDlg::OnBnClickedPlay()
 	btn_Pause.EnableWindow(true);
 	btn_Play.EnableWindow(false);
 	btn_Stop.EnableWindow(true);
-	
+	time_Slider.EnableWindow(true);
 	caption.Format(_T("Playing: %s"), filename);
 	filenameLabel.SetWindowTextW(caption);
 	state = PLAYING;
@@ -345,6 +345,7 @@ void CMediaPlayerDlg::OnBnClickedPause()
 void CMediaPlayerDlg::OnBnClickedStop()
 {
 	// TODO: Add your control notification handler code here
+	time_Slider.EnableWindow(false);
 	if (state == RECORDING) {
 		if (MCIWndCanSave(m_Player)) {
 			
