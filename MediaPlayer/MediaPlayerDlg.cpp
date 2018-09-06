@@ -521,7 +521,7 @@ void CMediaPlayerDlg::LoadFile(CString filepath)
 	MCIWndDestroy(m_Player);
 	KillTimer(1);
 	m_Player = MCIWndCreate(GetSafeHwnd(), AfxGetInstanceHandle(),
-		WS_CHILD,filename);
+		WS_CHILD,filepath);
 
 	MCIWndSetVolume(m_Player, volume_slider.GetPos());
 	MCIWndPlay(m_Player);
