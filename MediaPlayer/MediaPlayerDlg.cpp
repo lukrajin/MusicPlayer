@@ -323,6 +323,7 @@ void CMediaPlayerDlg::OnBnClickedPlay()
 	btn_Play.EnableWindow(false);
 	btn_Stop.EnableWindow(true);
 	time_Slider.EnableWindow(true);
+	
 	caption.Format(_T("Playing: %s"), filename);
 	filenameLabel.SetWindowTextW(caption);
 	state = PLAYING;
@@ -357,6 +358,7 @@ void CMediaPlayerDlg::OnBnClickedStop()
 			btn_Load.EnableWindow(true);
 			rec_Btn.EnableWindow(true);
 			vol_Btn.EnableWindow(true);
+			playlistCtrl.EnableWindow(true);
 			volume_slider.EnableWindow(true);
 			KillTimer(1);
 			time_Label.SetWindowTextW(_T("00:00/00:00"));
@@ -706,7 +708,7 @@ void CMediaPlayerDlg::OnBnClickedRecbutton()
 		rec_Btn.EnableWindow(false);
 		vol_Btn.EnableWindow(false);
 		volume_slider.EnableWindow(false);
-
+		playlistCtrl.EnableWindow(false);
 		state = RECORDING;
 		time_Slider.SetPos(0);
 		time_Slider.EnableWindow(false);
