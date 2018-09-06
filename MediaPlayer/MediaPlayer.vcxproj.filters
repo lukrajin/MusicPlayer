@@ -54,7 +54,6 @@
     <None Include="res\MediaPlayer.rc2">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\eq.avi" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\MediaPlayer.ico">
@@ -106,6 +105,18 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="res\recording.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\background.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\PearlWhite.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\silver-background.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\MetalChrome.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

@@ -133,7 +133,7 @@ BOOL CMediaPlayerDlg::OnInitDialog()
 	//  when the application's main window is not a dialog
 	HICON hIcn = (HICON)LoadImage(
 		AfxGetApp()->m_hInstance,
-		MAKEINTRESOURCE(IDI_ICON4),
+		MAKEINTRESOURCE(IDR_MAINFRAME),
 		IMAGE_ICON,
 		45, 45,
 		LR_DEFAULTCOLOR
@@ -149,7 +149,13 @@ BOOL CMediaPlayerDlg::OnInitDialog()
 
 	//HBITMAP hbit = (HBITMAP)LoadImage(NULL,MAKEINTRESOURCE(IDB_BITMAP1),IMAGE_BITMAP,0, 0,0);
 	//image_Control.SetBitmap(hbit);	
-	
+	hIcn = (HICON)LoadImage(
+		AfxGetApp()->m_hInstance,
+		MAKEINTRESOURCE(IDI_ICON4),
+		IMAGE_ICON,
+		45, 45,
+		LR_DEFAULTCOLOR
+	);
 	btn_Play.ModifyStyle(0, BS_ICON);
 	btn_Play.SetIcon(hIcn);
 
@@ -228,6 +234,18 @@ BOOL CMediaPlayerDlg::OnInitDialog()
 	audioImage.ModifyStyle(0, SS_BITMAP);
 	audioImage.SetBitmap(::LoadBitmap(
 		_AtlBaseModule.GetResourceInstance(), MAKEINTRESOURCE(IDB_BITMAP1)));
+
+	CFont *m_FontFileName = new CFont();
+	m_FontFileName->CreateFont(22, 0, 0, 0, FW_BOLD, 0, 0, 0, 0, 0, 0, 0, 0, _T("Bahnschrift"));
+	GetDlgItem(FILENAME)->SetFont(m_FontFileName, TRUE);
+	
+	CFont *m_FontTime = new CFont();
+	m_FontTime->CreatePointFont(90, _T("Bahnschrift"));
+	GetDlgItem(TIME_LABEL)->SetFont(m_FontTime, TRUE);
+	
+	CFont *m_FontVol = new CFont();
+	m_FontVol->CreatePointFont(70, _T("Bahnschrift"));
+	GetDlgItem(VOLUMECAPTION)->SetFont(m_FontVol, TRUE);
 	
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -270,7 +288,17 @@ void CMediaPlayerDlg::OnPaint()
 	}
 	else
 	{
-		CDialogEx::OnPaint();
+		CPaintDC dc(this);
+		CRect rect;
+		GetClientRect(&rect);
+		//ScreenToClient(rect);
+		BITMAP bmp;
+		HBITMAP hBmp = ::LoadBitmap(::AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP6));
+		::GetObject(hBmp, sizeof(bmp), &bmp);
+		HDC hDC = ::CreateCompatibleDC(NULL);
+		SelectObject(hDC, hBmp);
+		::BitBlt(dc.m_hDC, 0, 0, rect.Width(), rect.Height(), hDC, 0, 0, SRCCOPY);
+		CDialog::OnPaint();
 	}
 }
 
@@ -444,15 +472,13 @@ void CMediaPlayerDlg::OnDropFiles(HDROP hDropInfo)
 	CString sFile;
 	DWORD   nBuffer = 0;
 
-	// Get the number of files dropped 
 	int nFilesDropped = DragQueryFile(hDropInfo, 0xFFFFFFFF, NULL, 0);
 
 	for (int i = 0; i<nFilesDropped; i++)
 	{
-		// Get the buffer size of the file. 
+		 
 		nBuffer = DragQueryFile(hDropInfo, i, NULL, 0);
 
-		// Get path and name of the file 
 		DragQueryFile(hDropInfo, i, sFile.GetBuffer(nBuffer + 1), nBuffer + 1);
 		sFile.ReleaseBuffer();
 		loadMode = ADD;
@@ -495,7 +521,8 @@ void CMediaPlayerDlg::LoadFile(CString filepath)
 	MCIWndDestroy(m_Player);
 	KillTimer(1);
 	m_Player = MCIWndCreate(GetSafeHwnd(), AfxGetInstanceHandle(),
-		WS_CHILD, filepath);
+		WS_CHILD,filename);
+
 	MCIWndSetVolume(m_Player, volume_slider.GetPos());
 	MCIWndPlay(m_Player);
 	time_Slider.SetRangeMax(MCIWndGetLength(m_Player));
@@ -560,6 +587,7 @@ void CMediaPlayerDlg::OnLbnDblclkList1()
 
 void CMediaPlayerDlg::OnBnClickedVolumebutton()
 {
+	
 	HICON hIcn;
 	if (state == MUTED) {
 		CString s;
@@ -577,7 +605,8 @@ void CMediaPlayerDlg::OnBnClickedVolumebutton()
 			LR_DEFAULTCOLOR
 		);
 		vol_Btn.SetIcon(hIcn);
-		state = PLAYING;
+		state = oldState;
+		
 	}
 	else
 	{
@@ -585,6 +614,7 @@ void CMediaPlayerDlg::OnBnClickedVolumebutton()
 		s.Format(_T("%d%s"), 0, "%");
 		volumeCaption.SetWindowTextW(s);
 		volume_slider.EnableWindow(false);
+		oldState = state;
 		state = MUTED;
 		oldVolume = volume_slider.GetPos();
 		MCIWndSetVolume(m_Player, 0);
@@ -655,6 +685,8 @@ void CMediaPlayerDlg::OnBnClickedRecbutton()
 		WS_CHILD | MCIWNDF_RECORD, NULL);
 
 	MCIWndNew(m_Player,_T("waveaudio"));
+	SetRecordingDevice();
+
 	playlistCtrl.SetCurSel(-1);
 	
 	if (MCIWndCanRecord(m_Player))
@@ -699,5 +731,33 @@ void CMediaPlayerDlg::OnBnClickedRecbutton()
 		time_Slider.SetPos(0);
 		
 
+	}
+}
+void CMediaPlayerDlg::SetRecordingDevice() 
+{
+	MCI_WAVE_SET_PARMS set_parms; 
+	set_parms.wFormatTag = WAVE_FORMAT_PCM;
+	set_parms.wBitsPerSample = 16;
+	set_parms.nChannels = 1;
+	set_parms.nSamplesPerSec = 44100;
+	set_parms.nBlockAlign = (set_parms.nChannels*set_parms.wBitsPerSample) / 8;
+	set_parms.nAvgBytesPerSec = ((set_parms.wBitsPerSample) *
+		set_parms.nChannels *
+		set_parms.nSamplesPerSec) / 8;
+	
+	int deviceID = MCIWndGetDeviceID(m_Player);
+	int result = mciSendCommandA(deviceID, MCI_SET,
+		MCI_WAIT
+		| MCI_WAVE_SET_FORMATTAG
+		| MCI_WAVE_SET_BITSPERSAMPLE
+		| MCI_WAVE_SET_CHANNELS
+		| MCI_WAVE_SET_SAMPLESPERSEC
+		| MCI_WAVE_SET_AVGBYTESPERSEC
+		| MCI_WAVE_SET_BLOCKALIGN,
+		(DWORD)(LPVOID)&set_parms);
+	if (result) 
+	{
+		MessageBoxA(NULL, "Failed to set up recording device", "MCI_WAVE_SET_1", MB_OK);
+		return;
 	}
 }

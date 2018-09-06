@@ -71,6 +71,7 @@ public:
 	CListBox playlistCtrl;
 	std::map<CString, CString> playlist;
 	int state=UNLOADED;
+	int oldState;
 	CString filename;
 	CString caption;
 	CString dots;
@@ -81,11 +82,12 @@ public:
 	CButton bwd_Btn;
 	CButton fws_Btn;
 	afx_msg void OnBnClickedVolumebutton();
-	long oldVolume;
+	long oldVolume=500;
 	afx_msg void OnBnClickedFwdbutton();
 	void NextTrack();
 	afx_msg void OnBnClickedBwdbutton();
 	afx_msg void OnBnClickedRecbutton();
+	void SetRecordingDevice();
 	long recLenght;
 	CStatic audioImage;
 };

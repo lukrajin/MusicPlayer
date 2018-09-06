@@ -145,6 +145,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>Winmm.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -207,10 +208,10 @@
     <ResourceCompile Include="MediaPlayer.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\eq.avi" />
     <None Include="res\MediaPlayer.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\background.bmp" />
     <Image Include="res\bitmap1.bmp" />
     <Image Include="res\bitmap2.bmp" />
     <Image Include="res\default-cover-art.bmp" />
@@ -218,13 +219,16 @@
     <Image Include="res\Forward.ico" />
     <Image Include="res\Load.ico" />
     <Image Include="res\MediaPlayer.ico" />
+    <Image Include="res\MetalChrome.bmp" />
     <Image Include="res\Mute.ico" />
     <Image Include="res\Pause.ico" />
+    <Image Include="res\PearlWhite.bmp" />
     <Image Include="res\Play.ico" />
     <Image Include="res\Reapeat.ico" />
     <Image Include="res\Rec.ico" />
     <Image Include="res\recording.bmp" />
     <Image Include="res\Rewind.ico" />
+    <Image Include="res\silver-background.bmp" />
     <Image Include="res\Stop.ico" />
     <Image Include="res\track.gif" />
     <Image Include="res\Volume.ico" />
