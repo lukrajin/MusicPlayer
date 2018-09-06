@@ -108,7 +108,7 @@ END_MESSAGE_MAP()
 BOOL CMediaPlayerDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-
+	
 	// Add "About..." menu item to system menu.
 
 	// IDM_ABOUTBOX must be in the system command range.
@@ -389,8 +389,10 @@ void CMediaPlayerDlg::OnBnClickedStop()
 
 void CMediaPlayerDlg::OnBnClickedLoad()
 {
-	
-	CFileDialog dlgFile(TRUE);
+	CFileDialog dlgFile(TRUE, NULL, NULL, NULL,
+		_T("Audio Files (*.mp3;*.wma,*.wav;*.aac;*.aif;*.aifc;*.aiff;*.cda;*.m4a;*.mid;*.mp2)|*.mp3;*.wma,*.wav;*.aac;*.aif;*.aifc;*.aiff;*.cda;*.m4a;*.mid;*.mp2||")
+		, NULL, 0, TRUE);
+
 	if (dlgFile.DoModal() == IDOK)
 	{
 		CString file = dlgFile.GetPathName();
