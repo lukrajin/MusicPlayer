@@ -557,10 +557,13 @@ void CMediaPlayerDlg::LoadFile(CString filepath)
 		WS_CHILD,filepath);
 	if (filex != "wav") {
 		volume_slider.EnableWindow(true);
+		vol_Btn.EnableWindow(true);
 		MCIWndSetVolume(m_Player, volume_slider.GetPos());
 	}
-	else
+	else {
 		volume_slider.EnableWindow(false);
+		vol_Btn.EnableWindow(false);
+	}
 	
 	mp3Tag.Init(filepath);
 	CString current;
