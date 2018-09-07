@@ -82,6 +82,7 @@ void CMediaPlayerDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, BWDBUTTON, bwd_Btn);
 	DDX_Control(pDX, FWDBUTTON, fws_Btn);
 	DDX_Control(pDX, AUDIOIMAGE, audioImage);
+	DDX_Control(pDX, MP3TAGCAPTION, mp3Tag_caption);
 }
 
 BEGIN_MESSAGE_MAP(CMediaPlayerDlg, CDialogEx)
@@ -146,9 +147,6 @@ BOOL CMediaPlayerDlg::OnInitDialog()
 	volume_slider.SetPos(500);
 	
 
-
-	//HBITMAP hbit = (HBITMAP)LoadImage(NULL,MAKEINTRESOURCE(IDB_BITMAP1),IMAGE_BITMAP,0, 0,0);
-	//image_Control.SetBitmap(hbit);	
 	hIcn = (HICON)LoadImage(
 		AfxGetApp()->m_hInstance,
 		MAKEINTRESOURCE(IDI_ICON4),
@@ -238,7 +236,8 @@ BOOL CMediaPlayerDlg::OnInitDialog()
 	CFont *m_FontFileName = new CFont();
 	m_FontFileName->CreateFont(22, 0, 0, 0, FW_BOLD, 0, 0, 0, 0, 0, 0, 0, 0, _T("Bahnschrift"));
 	GetDlgItem(FILENAME)->SetFont(m_FontFileName, TRUE);
-	
+	GetDlgItem(MP3TAGCAPTION)->SetFont(m_FontFileName, TRUE);
+
 	CFont *m_FontTime = new CFont();
 	m_FontTime->CreatePointFont(90, _T("Bahnschrift"));
 	GetDlgItem(TIME_LABEL)->SetFont(m_FontTime, TRUE);
@@ -299,7 +298,6 @@ void CMediaPlayerDlg::OnPaint()
 		CPaintDC dc(this);
 		CRect rect;
 		GetClientRect(&rect);
-		//ScreenToClient(rect);
 		BITMAP bmp;
 		HBITMAP hBmp = ::LoadBitmap(::AfxGetInstanceHandle(), MAKEINTRESOURCE(IDB_BITMAP6));
 		::GetObject(hBmp, sizeof(bmp), &bmp);
@@ -321,7 +319,6 @@ HCURSOR CMediaPlayerDlg::OnQueryDragIcon()
 
 void CMediaPlayerDlg::OnBnClickedPlay()
 {
-	// TODO: Add your control notification handler code here
 	if (state == UNLOADED) {
 		OnBnClickedLoad();
 		return;
@@ -333,7 +330,7 @@ void CMediaPlayerDlg::OnBnClickedPlay()
 	time_Slider.EnableWindow(true);
 	
 	caption.Format(_T("Playing: %s"), filename);
-	filenameLabel.SetWindowTextW(caption);
+	filenameLabel.SetWindowText(caption);
 	state = PLAYING;
 	
 }
@@ -341,12 +338,11 @@ void CMediaPlayerDlg::OnBnClickedPlay()
 
 void CMediaPlayerDlg::OnBnClickedPause()
 {
-	// TODO: Add your control notification handler code here
 	MCIWndPause(m_Player);
 	btn_Pause.EnableWindow(false);
 	btn_Play.EnableWindow(true);
 	caption.Format(_T("Paused: %s"), filename);
-	filenameLabel.SetWindowTextW(caption);
+	filenameLabel.SetWindowText(caption);
 	state = PAUSED;
 }
 
@@ -369,9 +365,9 @@ void CMediaPlayerDlg::OnBnClickedStop()
 			playlistCtrl.EnableWindow(true);
 			volume_slider.EnableWindow(true);
 			KillTimer(1);
-			time_Label.SetWindowTextW(_T("00:00/00:00"));
+			time_Label.SetWindowText(_T("00:00/00:00"));
 			caption.Format(_T("File is not loaded"));
-			filenameLabel.SetWindowTextW(caption);
+			filenameLabel.SetWindowText(caption);
 			MCIWndStop(m_Player);
 			MCIWndSaveDialog(m_Player);
 			MCIWndDestroy(m_Player);
@@ -387,10 +383,10 @@ void CMediaPlayerDlg::OnBnClickedStop()
 	btn_Pause.EnableWindow(false);
 	CString s;
 	s.Format(_T("00:00/%s"), lenght);
-	time_Label.SetWindowTextW(s);
+	time_Label.SetWindowText(s);
 	time_Slider.SetPos(0);
 	caption.Format(_T("Stopped: %s"), filename);
-	filenameLabel.SetWindowTextW(caption);
+	filenameLabel.SetWindowText(caption);
 	state = STOPPED;
 }
 
@@ -428,7 +424,7 @@ void CMediaPlayerDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 		MCIWndSetVolume(m_Player, position);
 		CString s;
 		s.Format(_T("%d%s"), position / 10,"%");
-		volumeCaption.SetWindowTextW(s);
+		volumeCaption.SetWindowText(s);
 	
 
 		
@@ -440,6 +436,31 @@ void CMediaPlayerDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 void CMediaPlayerDlg::OnTimer(UINT_PTR nIDEvent)
 {
 	
+	
+	if (nIDEvent == 2) {
+		
+		CString current;
+		mp3Tag_caption.GetWindowText(current);
+
+		int iStart = 0;
+		current = current.Tokenize(_T(":"), iStart);
+		if (current == "Year")
+
+			current.Format(_T("Title: %s"), mp3Tag.title);
+		else if (current == "Title")
+
+			current.Format(_T("Artist: %s"), mp3Tag.artist);
+		else if (current == "Artist")
+
+			current.Format(_T("Album: %s"), mp3Tag.album);
+		else if (current == "Album")
+			if (current.SpanIncluding(_T("0123456789")) == current)
+				current.Format(_T("Year: %s"), mp3Tag.year);
+			else
+				current.Format(_T("Year: "));
+		mp3Tag_caption.SetWindowText(current);
+		return;
+	}
 	if (state == RECORDING) {
 		++recLenght;
 		int minutes = recLenght / 60;
@@ -452,7 +473,7 @@ void CMediaPlayerDlg::OnTimer(UINT_PTR nIDEvent)
 		else if (minutes < 10)
 			a.Format(_T("0%d:%d"), minutes, seconds);
 		
-		time_Label.SetWindowTextW(a);
+		time_Label.SetWindowText(a);
 		return;
 	}	
 
@@ -468,7 +489,7 @@ void CMediaPlayerDlg::OnTimer(UINT_PTR nIDEvent)
 			dots = "";
 
 		caption.Format(_T("Playing: %s %s"), filename, dots);
-		filenameLabel.SetWindowTextW(caption);
+		filenameLabel.SetWindowText(caption);
 	}
 	UpdateData(FALSE);
 	if (time_Slider.GetPos() == time_Slider.GetRangeMax()) {
@@ -532,10 +553,12 @@ void CMediaPlayerDlg::LoadFile(CString filepath)
 	}
 	
 	caption.Format(_T("Playing: %s"), filename);
-	filenameLabel.SetWindowTextW(caption);
+
+	filenameLabel.SetWindowText(caption);
 	MCIWndClose(m_Player);
 	MCIWndDestroy(m_Player);
 	KillTimer(1);
+	KillTimer(2);
 	m_Player = MCIWndCreate(GetSafeHwnd(), AfxGetInstanceHandle(),
 		WS_CHILD,filepath);
 	if (filex != "wav") {
@@ -545,10 +568,14 @@ void CMediaPlayerDlg::LoadFile(CString filepath)
 	else
 		volume_slider.EnableWindow(false);
 	
+	mp3Tag.Init(filepath);
+	CString current;
+	current.Format(_T("Title: %s"), mp3Tag.title);
+	mp3Tag_caption.SetWindowText(current);
 	MCIWndPlay(m_Player);
 	time_Slider.SetRangeMax(MCIWndGetLength(m_Player));
 	SetTimer(1, 1000, NULL);
-
+	SetTimer(2, 5000, NULL);
 	int total = MCIWndGetLength(m_Player);
 	total = total / 1000;
 	int minutes = total / 60;
@@ -588,7 +615,7 @@ void CMediaPlayerDlg::UpdateTimeCaption() {
 		a.Format(_T("%d:0%d/%s"), minutes, seconds, lenght);
 	else if (minutes<10)
 		a.Format(_T("0%d:%d/%s"), minutes, seconds, lenght);
-	time_Label.SetWindowTextW(a);
+	time_Label.SetWindowText(a);
 }
 
 
@@ -601,7 +628,7 @@ void CMediaPlayerDlg::OnLbnDblclkList1()
 	loadMode = CHANGE;
 	LoadFile(playlist.at(selectedFileName));
 	caption.Format(_T("Playing: %s"), filename);
-	filenameLabel.SetWindowTextW(caption);
+	filenameLabel.SetWindowText(caption);
 	
 }
 
@@ -613,7 +640,7 @@ void CMediaPlayerDlg::OnBnClickedVolumebutton()
 	if (state == MUTED) {
 		CString s;
 		s.Format(_T("%d%s"), oldVolume / 10, "%");
-		volumeCaption.SetWindowTextW(s);
+		volumeCaption.SetWindowText(s);
 		volume_slider.EnableWindow(true);
 		MCIWndSetVolume(m_Player, oldVolume);
 		volume_slider.SetPos(oldVolume);
@@ -633,7 +660,7 @@ void CMediaPlayerDlg::OnBnClickedVolumebutton()
 	{
 		CString s;
 		s.Format(_T("%d%s"), 0, "%");
-		volumeCaption.SetWindowTextW(s);
+		volumeCaption.SetWindowText(s);
 		volume_slider.EnableWindow(false);
 		oldState = state;
 		state = MUTED;
@@ -670,7 +697,7 @@ void CMediaPlayerDlg::NextTrack()
 		playlistCtrl.GetText(currentTrack + 1, next);
 		LoadFile(playlist.at(next));
 		caption.Format(_T("Playing: %s"), filename);
-		filenameLabel.SetWindowTextW(caption);
+		filenameLabel.SetWindowText(caption);
 	}
 	
 }
@@ -690,7 +717,7 @@ void CMediaPlayerDlg::OnBnClickedBwdbutton()
 		playlistCtrl.GetText(currentTrack - 1, prev);
 		LoadFile(playlist.at(prev));
 		caption.Format(_T("Playing: %s"), filename);
-		filenameLabel.SetWindowTextW(caption);
+		filenameLabel.SetWindowText(caption);
 	}
 	
 }
@@ -701,7 +728,8 @@ void CMediaPlayerDlg::OnBnClickedRecbutton()
 	MCIWndClose(m_Player);
 	MCIWndDestroy(m_Player);
 	KillTimer(1);
-
+	KillTimer(2);
+	mp3Tag_caption.SetWindowText(_T(""));
 	m_Player = MCIWndCreate(GetSafeHwnd(), AfxGetInstanceHandle(),
 		WS_CHILD | MCIWNDF_RECORD, NULL);
 
@@ -731,14 +759,14 @@ void CMediaPlayerDlg::OnBnClickedRecbutton()
 		time_Slider.SetPos(0);
 		time_Slider.EnableWindow(false);
 		caption.Format(_T("Recording..."));
-		filenameLabel.SetWindowTextW(caption);
+		filenameLabel.SetWindowText(caption);
 		SetTimer(1, 1000, NULL);
 	}
 	else
 	{
-		MessageBoxA(GetSafeHwnd(),
-			"This device doesn't record.",
-			"Error",
+		MessageBox(
+			messages.GetMessage(NO_DEVICE).text,
+			messages.GetMessage(NO_DEVICE).caption,
 			MB_OK);
 		btn_Play.EnableWindow(true);
 		btn_Stop.EnableWindow(false);
@@ -746,9 +774,9 @@ void CMediaPlayerDlg::OnBnClickedRecbutton()
 		fws_Btn.EnableWindow(false);
 		bwd_Btn.EnableWindow(false);
 		state = UNLOADED;
-		time_Label.SetWindowTextW(_T("00:00/00:00"));
+		time_Label.SetWindowText(_T("00:00/00:00"));
 		caption.Format(_T("File is not loaded"));
-		filenameLabel.SetWindowTextW(caption);
+		filenameLabel.SetWindowText(caption);
 		time_Slider.SetPos(0);
 		
 
@@ -767,7 +795,7 @@ void CMediaPlayerDlg::SetRecordingDevice()
 		set_parms.nSamplesPerSec) / 8;
 	
 	int deviceID = MCIWndGetDeviceID(m_Player);
-	int result = mciSendCommandA(deviceID, MCI_SET,
+	int result = mciSendCommand(deviceID, MCI_SET,
 		MCI_WAIT
 		| MCI_WAVE_SET_FORMATTAG
 		| MCI_WAVE_SET_BITSPERSAMPLE
@@ -775,10 +803,10 @@ void CMediaPlayerDlg::SetRecordingDevice()
 		| MCI_WAVE_SET_SAMPLESPERSEC
 		| MCI_WAVE_SET_AVGBYTESPERSEC
 		| MCI_WAVE_SET_BLOCKALIGN,
-		(DWORD)(LPVOID)&set_parms);
+		reinterpret_cast<DWORD_PTR>(&set_parms));
 	if (result) 
 	{
-		MessageBoxA(NULL, "Failed to set up recording device", "MCI_WAVE_SET_1", MB_OK);
+		MessageBox(messages.GetMessage(DEVICE_SET_FAIL).text, messages.GetMessage(DEVICE_SET_FAIL).caption, MB_OK);
 		return;
 	}
 }

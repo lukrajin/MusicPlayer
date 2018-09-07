@@ -1,10 +1,11 @@
 
 // MediaPlayerDlg.h : header file
 //
-
 #pragma once
 #include "afxwin.h"
 #include "afxcmn.h"
+#include "MP3TAG.h"
+#include "Messages.h"
 #include <map>
 #define PLAYING 0
 #define PAUSED 1
@@ -14,6 +15,8 @@
 #define CHANGE 5
 #define MUTED 6
 #define RECORDING 7
+#define NO_DEVICE 1
+#define DEVICE_SET_FAIL 2
 
 
 // CMediaPlayerDlg dialog
@@ -90,4 +93,7 @@ public:
 	void SetRecordingDevice();
 	long recLenght;
 	CStatic audioImage;
+	CStatic mp3Tag_caption;
+	MP3TAG mp3Tag;
+	Messages messages;
 };
