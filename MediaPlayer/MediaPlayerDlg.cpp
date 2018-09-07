@@ -329,7 +329,7 @@ void CMediaPlayerDlg::OnBnClickedPlay()
 	btn_Stop.EnableWindow(true);
 	time_Slider.EnableWindow(true);
 	
-	caption.Format(_T("Playing: %s"), filename);
+	caption.Format(_T("Playing:  %s"), filename);
 	filenameLabel.SetWindowText(caption);
 	state = PLAYING;
 	
@@ -341,7 +341,7 @@ void CMediaPlayerDlg::OnBnClickedPause()
 	MCIWndPause(m_Player);
 	btn_Pause.EnableWindow(false);
 	btn_Play.EnableWindow(true);
-	caption.Format(_T("Paused: %s"), filename);
+	caption.Format(_T("Paused:  %s"), filename);
 	filenameLabel.SetWindowText(caption);
 	state = PAUSED;
 }
@@ -385,7 +385,7 @@ void CMediaPlayerDlg::OnBnClickedStop()
 	s.Format(_T("00:00/%s"), lenght);
 	time_Label.SetWindowText(s);
 	time_Slider.SetPos(0);
-	caption.Format(_T("Stopped: %s"), filename);
+	caption.Format(_T("Stopped:  %s"), filename);
 	filenameLabel.SetWindowText(caption);
 	state = STOPPED;
 }
@@ -394,7 +394,7 @@ void CMediaPlayerDlg::OnBnClickedStop()
 void CMediaPlayerDlg::OnBnClickedLoad()
 {
 	CFileDialog dlgFile(TRUE, NULL, NULL, NULL,
-		_T("Audio Files (*.mp3;*.wma,*.wav;*.aac;*.aif;*.aifc;*.aiff;*.cda;*.m4a;*.mid;*.mp2)|*.mp3;*.wma,*.wav;*.aac;*.aif;*.aifc;*.aiff;*.cda;*.m4a;*.mid;*.mp2||")
+		_T("Audio Files (*.mp3;*.wma,*.wav;*.aac;*.aif;*.aifc;*.aiff;*.cda;*.m4a;*.mid;*.mp2)|*.mp3;*.wma;*.wav;*.aac;*.aif;*.aifc;*.aiff;*.cda;*.m4a;*.mid;*.mp2||")
 		, NULL, 0, TRUE);
 
 	if (dlgFile.DoModal() == IDOK)
@@ -478,19 +478,6 @@ void CMediaPlayerDlg::OnTimer(UINT_PTR nIDEvent)
 	}	
 
 	UpdateTimeCaption();
-	if (state == PLAYING) {
-		if (dots == "")
-			dots = ".";
-		else if (dots == ".")
-			dots = "..";
-		else if (dots == "..")
-			dots = "...";
-		else
-			dots = "";
-
-		caption.Format(_T("Playing: %s %s"), filename, dots);
-		filenameLabel.SetWindowText(caption);
-	}
 	UpdateData(FALSE);
 	if (time_Slider.GetPos() == time_Slider.GetRangeMax()) {
 		NextTrack();
@@ -557,7 +544,7 @@ void CMediaPlayerDlg::LoadFile(CString filepath)
 		
 	}
 	
-	caption.Format(_T("Playing: %s"), filename);
+	caption.Format(_T("Playing:  %s"), filename);
 
 	filenameLabel.SetWindowText(caption);
 	MCIWndClose(m_Player);
@@ -581,7 +568,7 @@ void CMediaPlayerDlg::LoadFile(CString filepath)
 	mp3Tag_caption.SetWindowText(current);
 	MCIWndPlay(m_Player);
 	time_Slider.SetRangeMax(MCIWndGetLength(m_Player));
-	SetTimer(1, 1000, NULL);
+	SetTimer(1, 100, NULL);
 	SetTimer(2, 5000, NULL);
 	int total = MCIWndGetLength(m_Player);
 	total = total / 1000;
@@ -634,7 +621,7 @@ void CMediaPlayerDlg::OnLbnDblclkList1()
 	playlistCtrl.GetText(index, selectedFileName);
 	loadMode = CHANGE;
 	LoadFile(playlist.at(selectedFileName));
-	caption.Format(_T("Playing: %s"), filename);
+	caption.Format(_T("Playing:  %s"), filename);
 	filenameLabel.SetWindowText(caption);
 	
 }
@@ -703,7 +690,7 @@ void CMediaPlayerDlg::NextTrack()
 		playlistCtrl.SetCurSel(currentTrack + 1);
 		playlistCtrl.GetText(currentTrack + 1, next);
 		LoadFile(playlist.at(next));
-		caption.Format(_T("Playing: %s"), filename);
+		caption.Format(_T("Playing:  %s"), filename);
 		filenameLabel.SetWindowText(caption);
 	}
 	
@@ -723,7 +710,7 @@ void CMediaPlayerDlg::OnBnClickedBwdbutton()
 		playlistCtrl.SetCurSel(currentTrack -1);
 		playlistCtrl.GetText(currentTrack - 1, prev);
 		LoadFile(playlist.at(prev));
-		caption.Format(_T("Playing: %s"), filename);
+		caption.Format(_T("Playing:  %s"), filename);
 		filenameLabel.SetWindowText(caption);
 	}
 	
