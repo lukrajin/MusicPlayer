@@ -524,10 +524,15 @@ void CMediaPlayerDlg::OnDropFiles(HDROP hDropInfo)
 }
 
 void CMediaPlayerDlg::LoadFile(CString filepath) 
-{
+{	
+	oldFilename = filename;
 	filename = filepath.Mid(filepath.ReverseFind('\\') + 1);
 	CString filex = filename.Mid(filename.ReverseFind('.') + 1);
-	
+	if (filex != "wma" && filex != "mp3" && filex != "wav") {
+		filename = oldFilename;
+		MessageBox(messages.GetMessage(LOADING_FILE_ERROR).text, messages.GetMessage(LOADING_FILE_ERROR).caption, MB_OK);
+		return;
+	}
 
 	if (playlist.find(filename) == playlist.end()) {
 		playlist[filename] = filepath;
@@ -559,6 +564,8 @@ void CMediaPlayerDlg::LoadFile(CString filepath)
 	MCIWndDestroy(m_Player);
 	KillTimer(1);
 	KillTimer(2);
+	
+	
 	m_Player = MCIWndCreate(GetSafeHwnd(), AfxGetInstanceHandle(),
 		WS_CHILD,filepath);
 	if (filex != "wav") {

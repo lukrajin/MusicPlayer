@@ -17,6 +17,7 @@
 #define RECORDING 7
 #define NO_DEVICE 1
 #define DEVICE_SET_FAIL 2
+#define LOADING_FILE_ERROR 3
 
 
 // CMediaPlayerDlg dialog
@@ -76,6 +77,7 @@ public:
 	int state=UNLOADED;
 	int oldState;
 	CString filename;
+	CString oldFilename;
 	CString caption;
 	CString dots;
 	int loadMode;
