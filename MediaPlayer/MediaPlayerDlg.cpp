@@ -11,7 +11,6 @@
 #include ".\MediaPlayerDlg.h"
 #include <map>
 
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -151,7 +150,7 @@ BOOL CMediaPlayerDlg::OnInitDialog()
 		AfxGetApp()->m_hInstance,
 		MAKEINTRESOURCE(IDI_ICON4),
 		IMAGE_ICON,
-		45, 45,
+		40, 40,
 		LR_DEFAULTCOLOR
 	);
 	btn_Play.ModifyStyle(0, BS_ICON);
@@ -163,7 +162,7 @@ BOOL CMediaPlayerDlg::OnInitDialog()
 		AfxGetApp()->m_hInstance,
 		MAKEINTRESOURCE(IDI_ICON6),
 		IMAGE_ICON,
-		35, 35, 
+		30, 30, 
 		LR_DEFAULTCOLOR
 	);
 	btn_Stop.SetIcon(hIcn);
@@ -173,7 +172,7 @@ BOOL CMediaPlayerDlg::OnInitDialog()
 		AfxGetApp()->m_hInstance,
 		MAKEINTRESOURCE(IDI_ICON3),
 		IMAGE_ICON,
-		35, 35, 
+		30, 30, 
 		LR_DEFAULTCOLOR
 	);
 	btn_Pause.SetIcon(hIcn);
@@ -183,7 +182,7 @@ BOOL CMediaPlayerDlg::OnInitDialog()
 		AfxGetApp()->m_hInstance,
 		MAKEINTRESOURCE(IDI_ICON2),
 		IMAGE_ICON,
-		40, 40, 
+		30, 30, 
 		LR_DEFAULTCOLOR
 	);
 	btn_Load.SetIcon(hIcn);
@@ -193,7 +192,7 @@ BOOL CMediaPlayerDlg::OnInitDialog()
 		AfxGetApp()->m_hInstance,
 		MAKEINTRESOURCE(IDI_ICON9),
 		IMAGE_ICON,
-		40, 40,
+		30, 30,
 		LR_DEFAULTCOLOR
 	);
 	rec_Btn.SetIcon(hIcn);
@@ -213,7 +212,7 @@ BOOL CMediaPlayerDlg::OnInitDialog()
 		AfxGetApp()->m_hInstance,
 		MAKEINTRESOURCE(IDI_ICON1),
 		IMAGE_ICON,
-		35, 35,
+		30, 30,
 		LR_DEFAULTCOLOR
 	);
 
@@ -224,7 +223,7 @@ BOOL CMediaPlayerDlg::OnInitDialog()
 		AfxGetApp()->m_hInstance,
 		MAKEINTRESOURCE(IDI_ICON10),
 		IMAGE_ICON,
-		35, 35,
+		30, 30,
 		LR_DEFAULTCOLOR
 	);
 	bwd_Btn.SetIcon(hIcn);
@@ -234,7 +233,7 @@ BOOL CMediaPlayerDlg::OnInitDialog()
 		_AtlBaseModule.GetResourceInstance(), MAKEINTRESOURCE(IDB_BITMAP1)));
 
 	CFont *m_FontFileName = new CFont();
-	m_FontFileName->CreateFont(22, 0, 0, 0, FW_BOLD, 0, 0, 0, 0, 0, 0, 0, 0, _T("Bahnschrift"));
+	m_FontFileName->CreateFont(20, 0, 0, 0, FW_BOLD, 0, 0, 0, 0, 0, 0, 0, 0, _T("Bahnschrift"));
 	GetDlgItem(FILENAME)->SetFont(m_FontFileName, TRUE);
 	GetDlgItem(MP3TAGCAPTION)->SetFont(m_FontFileName, TRUE);
 
@@ -243,17 +242,25 @@ BOOL CMediaPlayerDlg::OnInitDialog()
 	GetDlgItem(TIME_LABEL)->SetFont(m_FontTime, TRUE);
 	
 	CFont *m_FontVol = new CFont();
-	m_FontVol->CreatePointFont(70, _T("Bahnschrift"));
+	m_FontVol->CreatePointFont(80, _T("Bahnschrift"));
 	GetDlgItem(VOLUMECAPTION)->SetFont(m_FontVol, TRUE);
 		
-	
-	/*
-	CString filepath = GetCommandLine();
-	filepath.Delete(filepath.GetLength() - 1);
-	CString name = filepath.Mid(filepath.ReverseFind('\\') + 1);
-	if(name!="MediaPlayer.exe")
-		LoadFile(filepath);
-	*/
+	LPWSTR *argList;
+	int nArgs;
+	int i;
+
+	argList = CommandLineToArgvW(GetCommandLine(), &nArgs);
+	if (argList==NULL)
+	{
+		MessageBox(messages.GetMessage(CMD_FAIL).text, messages.GetMessage(CMD_FAIL).caption, MB_OK);
+		
+	}
+	else if(nArgs>1)
+	{
+		for (i = 1; i < nArgs; i++) {
+		LoadFile(argList[i]);
+		}
+	}
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -393,6 +400,7 @@ void CMediaPlayerDlg::OnBnClickedStop()
 
 void CMediaPlayerDlg::OnBnClickedLoad()
 {
+	
 	CFileDialog dlgFile(TRUE, NULL, NULL, NULL,
 		_T("Audio Files (*.mp3;*.wma,*.wav;*.aac;*.aif;*.aifc;*.aiff;*.cda;*.m4a;*.mid;*.mp2)|*.mp3;*.wma;*.wav;*.aac;*.aif;*.aifc;*.aiff;*.cda;*.m4a;*.mid;*.mp2||")
 		, NULL, 0, TRUE);
@@ -514,8 +522,18 @@ void CMediaPlayerDlg::LoadFile(CString filepath)
 {	
 	oldFilename = filename;
 	filename = filepath.Mid(filepath.ReverseFind('\\') + 1);
+	
 	CString filex = filename.Mid(filename.ReverseFind('.') + 1);
-	if (filex != "wma" && filex != "mp3" && filex != "wav") {
+	bool isValidEx = false;
+	for (auto it = extensions.begin(); it != extensions.end(); ++it) {
+		if(filex==*it)
+		{
+			isValidEx = true;
+			break;
+		}
+			
+	}
+	if (!isValidEx) {
 		filename = oldFilename;
 		MessageBox(messages.GetMessage(LOADING_FILE_ERROR).text, messages.GetMessage(LOADING_FILE_ERROR).caption, MB_OK);
 		return;

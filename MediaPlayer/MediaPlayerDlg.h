@@ -7,6 +7,7 @@
 #include "MP3TAG.h"
 #include "Messages.h"
 #include <map>
+#include <list>
 #define PLAYING 0
 #define PAUSED 1
 #define STOPPED 2
@@ -18,6 +19,7 @@
 #define NO_DEVICE 1
 #define DEVICE_SET_FAIL 2
 #define LOADING_FILE_ERROR 3
+#define CMD_FAIL 4
 
 
 // CMediaPlayerDlg dialog
@@ -98,4 +100,5 @@ public:
 	CStatic mp3Tag_caption;
 	MP3TAG mp3Tag;
 	Messages messages;
+	std::list<CString> extensions={ _T("mp3"),_T("wma"), _T("wav"),_T("aac"),_T("aif"),_T("aifc"),_T("aiff"),_T("cda"),_T("m4a"),_T("mid"),_T("mp2") };
 };
