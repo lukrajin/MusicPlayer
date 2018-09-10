@@ -5,21 +5,12 @@
 #include "afxwin.h"
 #include "afxcmn.h"
 #include "MP3TAG.h"
-#include "Messages.h"
 #include <map>
 #include <list>
-#define PLAYING 0
-#define PAUSED 1
-#define STOPPED 2
-#define UNLOADED 3
-#define ADD 4
-#define CHANGE 5
-#define MUTED 6
-#define RECORDING 7
-#define NO_DEVICE 1
-#define DEVICE_SET_FAIL 2
-#define LOADING_FILE_ERROR 3
-#define CMD_FAIL 4
+#include "PlaybackInfo.h"
+#include "RecordingInfo.h"
+
+#define DELAY 100
 
 
 // CMediaPlayerDlg dialog
@@ -65,24 +56,20 @@ public:
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	void OnTimer(UINT_PTR nIDEvent);
 	CStatic time_Label;
-	CString lenght;
 
 	CStatic filenameLabel;
 	afx_msg void OnDropFiles(HDROP hDropInfo);
 	void LoadFile(CString filepath);
+	int AddPlaylistItem(CString filepath);
 	void UpdateTimeCaption();
 	CButton btn_Load;
 	
 	CStatic volumeCaption;
 	CListBox playlistCtrl;
 	std::map<CString, CString> playlist;
-	int state=UNLOADED;
-	int oldState;
 	CString filename;
 	CString oldFilename;
 	CString caption;
-	CString dots;
-	int loadMode;
 	afx_msg void OnLbnDblclkList1();
 	CButton vol_Btn;
 	CButton rec_Btn;
@@ -94,11 +81,14 @@ public:
 	void NextTrack();
 	afx_msg void OnBnClickedBwdbutton();
 	afx_msg void OnBnClickedRecbutton();
-	void SetRecordingDevice();
-	long recLenght;
+
+	
 	CStatic audioImage;
 	CStatic mp3Tag_caption;
 	MP3TAG mp3Tag;
-	Messages messages;
-	std::list<CString> extensions={ _T("mp3"),_T("wma"), _T("wav"),_T("aac"),_T("aif"),_T("aifc"),_T("aiff"),_T("cda"),_T("m4a"),_T("mid"),_T("mp2") };
+	int tagTimer = 0;
+	PlaybackInfo playbackInfo;
+	RecordingInfo rinfo;
+	enum Tags{ Title, Artist, Album, Year };
+	Tags currentTag;
 };

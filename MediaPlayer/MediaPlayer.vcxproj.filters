@@ -36,7 +36,10 @@
     <ClInclude Include="MP3TAG.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Messages.h">
+    <ClInclude Include="PlaybackInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RecordingInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -53,7 +56,10 @@
     <ClCompile Include="MP3TAG.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Messages.cpp">
+    <ClCompile Include="PlaybackInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RecordingInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

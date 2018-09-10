@@ -11,6 +11,7 @@ class MP3TAG {
 
 public:
 
+	
 	struct TAGdata
 	{
 		char tag[3];

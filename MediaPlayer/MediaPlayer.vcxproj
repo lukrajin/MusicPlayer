@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B051B523-817F-4C81-AB24-3D1D8A4CA160}</ProjectGuid>
     <RootNamespace>MediaPlayer</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
     <Keyword>MFCProj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -191,8 +191,9 @@
   <ItemGroup>
     <ClInclude Include="MediaPlayer.h" />
     <ClInclude Include="MediaPlayerDlg.h" />
-    <ClInclude Include="Messages.h" />
     <ClInclude Include="MP3TAG.h" />
+    <ClInclude Include="PlaybackInfo.h" />
+    <ClInclude Include="RecordingInfo.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -200,8 +201,9 @@
   <ItemGroup>
     <ClCompile Include="MediaPlayer.cpp" />
     <ClCompile Include="MediaPlayerDlg.cpp" />
-    <ClCompile Include="Messages.cpp" />
     <ClCompile Include="MP3TAG.cpp" />
+    <ClCompile Include="PlaybackInfo.cpp" />
+    <ClCompile Include="RecordingInfo.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
