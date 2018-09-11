@@ -64,7 +64,7 @@ public:
 	CButton btn_Load;
 	
 	CStatic volumeCaption;
-	CListBox playlistCtrl;
+	CDragListBox playlistCtrl;
 	CString filename;
 	CString oldFilename;
 	CString caption;

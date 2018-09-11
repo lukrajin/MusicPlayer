@@ -406,16 +406,21 @@ void CMediaPlayerDlg::OnBnClickedLoad()
 {
 	TCHAR filter[256];
 	LoadString(0, FILE_FILTER, filter, 256);
-	CFileDialog dlgFile(TRUE, NULL, NULL, NULL,
+	CFileDialog dlgFile(TRUE, NULL, NULL, OFN_ALLOWMULTISELECT,
 		filter
 		, NULL, 0, TRUE);
 
 	if (dlgFile.DoModal() == IDOK)
 	{
-		CString file = dlgFile.GetPathName();
-		playbackInfo.currentLoadMode = playbackInfo.ADD;
-		LoadFile(file);
+		POSITION pos(dlgFile.GetStartPosition());
 
+		while (pos)
+		{
+			CString fileName(dlgFile.GetNextPathName(pos));
+			playbackInfo.currentLoadMode = playbackInfo.ADD;
+			LoadFile(fileName);
+	
+		}
 		
 	}
 }
