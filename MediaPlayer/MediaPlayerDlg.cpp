@@ -331,7 +331,7 @@ HCURSOR CMediaPlayerDlg::OnQueryDragIcon()
 
 void CMediaPlayerDlg::OnBnClickedPlay()
 {
-	if (playbackInfo.currentState == playbackInfo.UNLOADED) {
+	if (playlistCtrl.GetCurSel()==-1) {
 		OnBnClickedLoad();
 		return;
 	}
@@ -361,14 +361,13 @@ void CMediaPlayerDlg::OnBnClickedPause()
 
 void CMediaPlayerDlg::OnBnClickedStop()
 {
-	// TODO: Add your control notification handler code here
+	
 	time_Slider.EnableWindow(false);
 	if (playbackInfo.currentState == playbackInfo.RECORDING) {
 		if (MCIWndCanSave(m_Player)) {
 			
 			audioImage.SetBitmap(::LoadBitmap(
 				_AtlBaseModule.GetResourceInstance(), MAKEINTRESOURCE(IDB_BITMAP1)));
-			playbackInfo.currentState = playbackInfo.UNLOADED;
 			btn_Play.EnableWindow(true);
 			btn_Stop.EnableWindow(false);
 			btn_Load.EnableWindow(true);
@@ -591,9 +590,11 @@ void CMediaPlayerDlg::LoadFile(CString filepath)
 
 int CMediaPlayerDlg::AddPlaylistItem(CString filepath) {
 
-	if (playlist.find(filename) == playlist.end()) {
-		playlist[filename] = filepath;
+	if (playlistCtrl.FindString(-1,filename)==LB_ERR) {
+		
 		playlistCtrl.AddString(filename);
+		playlistCtrl.SetItemDataPtr(currentPlaylistIndex, reinterpret_cast<void*>(new CString(filepath)));
+		++currentPlaylistIndex;
 		UpdateData(false);
 	}
 
@@ -603,7 +604,7 @@ int CMediaPlayerDlg::AddPlaylistItem(CString filepath) {
 			CString first;
 			playlistCtrl.GetText(0, first);
 			filename = first;
-			filepath = playlist.at(first);
+			filepath = *reinterpret_cast<CString*>(playlistCtrl.GetItemDataPtr(0));
 			return 0;
 		}
 		else {
@@ -633,9 +634,9 @@ void CMediaPlayerDlg::OnLbnDblclkList1()
 	index = playlistCtrl.GetCurSel();
 	if (index < 0)
 		return;
-	playlistCtrl.GetText(index, selectedFileName);
+
 	playbackInfo.currentLoadMode = playbackInfo.CHANGE;
-	LoadFile(playlist.at(selectedFileName));
+	LoadFile(*reinterpret_cast<CString*>(playlistCtrl.GetItemDataPtr(index)));
 	caption.Format(_T("%s:  %s"), playbackInfo.GetStateCaption(PLAYCAP),filename);
 	filenameLabel.SetWindowText(caption);
 	
@@ -703,8 +704,7 @@ void CMediaPlayerDlg::NextTrack()
 	else {
 		CString next;
 		playlistCtrl.SetCurSel(currentTrack + 1);
-		playlistCtrl.GetText(currentTrack + 1, next);
-		LoadFile(playlist.at(next));
+		LoadFile(*reinterpret_cast<CString*>(playlistCtrl.GetItemDataPtr(currentTrack+1)));
 		caption.Format(_T("%s:  %s"),playbackInfo.GetStateCaption(PLAYCAP),filename);
 		filenameLabel.SetWindowText(caption);
 	}
@@ -723,8 +723,7 @@ void CMediaPlayerDlg::OnBnClickedBwdbutton()
 	else {
 		CString prev;
 		playlistCtrl.SetCurSel(currentTrack -1);
-		playlistCtrl.GetText(currentTrack - 1, prev);
-		LoadFile(playlist.at(prev));
+		LoadFile(*reinterpret_cast<CString*>(playlistCtrl.GetItemDataPtr(currentTrack-1)));
 		caption.Format(_T("%s:  %s"), playbackInfo.GetStateCaption(PLAYCAP),filename);
 		filenameLabel.SetWindowText(caption);
 	}

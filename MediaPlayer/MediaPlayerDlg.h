@@ -5,7 +5,6 @@
 #include "afxwin.h"
 #include "afxcmn.h"
 #include "MP3TAG.h"
-#include <map>
 #include <list>
 #include "PlaybackInfo.h"
 #include "RecordingInfo.h"
@@ -66,7 +65,6 @@ public:
 	
 	CStatic volumeCaption;
 	CListBox playlistCtrl;
-	std::map<CString, CString> playlist;
 	CString filename;
 	CString oldFilename;
 	CString caption;
@@ -91,4 +89,5 @@ public:
 	RecordingInfo rinfo;
 	enum Tags{ Title, Artist, Album, Year };
 	Tags currentTag;
+	int currentPlaylistIndex = 0;
 };
